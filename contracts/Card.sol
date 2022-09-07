@@ -2,8 +2,6 @@
 pragma solidity ^0.8.9;
 
 // Import this file to use console.log
-import "hardhat/console.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import './RandomlyAssigned.sol';
@@ -13,7 +11,6 @@ interface IPack {
     function ownerOf(uint256 tokenId) external view returns (address);
 }
 contract Card is ERC1155, Ownable {
-    using ECDSA for bytes32;
     address public immutable packContract;
 
     string[] uris;

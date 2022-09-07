@@ -1,26 +1,32 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
+const { keccak256 } = require("ethers/lib/utils");
 const hre = require("hardhat");
+const {MerkleTree} = require("merkletreejs");
+const whitelist = require("../whitelist.json");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const uris = ["https://commonuri", "https://rareuri", "https://legendaryuri", "https://landuri"]
 
-  const lockedAmount = hre.ethers.utils.parseEther("1");
+  const Pack = await hre.ethers.getContractFactory("Pack");
+  const pack = await Pack.deploy();
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  await pack.deployed();
 
-  await lock.deployed();
+  console.log(`Pack deployed to ${pack.address}`);
 
-  console.log(
-    `Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
-  );
+  const Card = await hre.ethers.getContractFactory("Card");
+  const card = await Card.deploy(pack.address, uris);
+
+  await card.deployed();
+
+  console.log(`Card deployed to ${card.address}`);
+
+  console.log("Setting card contract in pack contract");
+  await pack.setCardContract(card.address);
+
+  const leaves = whitelist.map(address => keccak256(address))
+  tree = new MerkleTree(leaves, keccak256, { sort: true })
+  const merkleRoot = tree.getHexRoot()
+  await pack.setMerkleRoot(merkleRoot);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
