@@ -11,3 +11,8 @@ GAS_REPORT=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.js
 ```
+
+
+Pack contract: 0x4d040137230F0bCE6470a58732e0165175Ae2Be6
+
+Card contract: 0x56617F13E8BD67AB346EFd56a8112B0FD8dd0220

@@ -3,12 +3,13 @@ pragma solidity ^0.8.9;
 
 // Import this file to use console.log
 import "hardhat/console.sol";
-import "erc721a/contracts/ERC721A.sol";
+import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 // import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 
-contract Pack is ERC721A, Ownable {
+contract Pack is ERC721AUpgradeable, OwnableUpgradeable {
     // using ECDSA for bytes32;
     uint256 constant public publicPrice = 0.15 ether;
     uint256 constant priavetPrice = 0.08 ether;
@@ -16,7 +17,6 @@ contract Pack is ERC721A, Ownable {
     uint256 constant whitelistMaxMint = 1500;
     uint256 constant reservedMaxMint = 1000;
 
-    string constant public prefix = "Base Verification:";
     address public cardContract;
     string _baseTokenURI;
     bytes32 merkleRoot;
@@ -25,7 +25,10 @@ contract Pack is ERC721A, Ownable {
     uint256 privatedClaimed;
     uint256 reservedClaimed;
 
-    constructor() ERC721A("Capsule Pack", "CP") {}
+    function initialize()  public initializerERC721A  initializer {
+        __Ownable_init();
+        __ERC721A_init("Capsule Pack", "CP");
+    }
 
     function setMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
         merkleRoot = _merkleRoot;
@@ -55,7 +58,7 @@ contract Pack is ERC721A, Ownable {
         uint256 quantity
     ) external payable {
         bytes32 leaf = keccak256(abi.encodePacked((msg.sender)));
-        require(MerkleProof.verify(_merkleProof, merkleRoot, leaf), "Not whitelist");
+        require(MerkleProofUpgradeable.verify(_merkleProof, merkleRoot, leaf), "Not whitelist");
         
         require(quantity + privatedClaimed <= whitelistMaxMint, "Exceeds max supply");
         privatedClaimed += quantity;
@@ -92,27 +95,9 @@ contract Pack is ERC721A, Ownable {
         cardContract = _newAddress;
     }
 
-    // function _hash(string memory _prefix, address _address)
-    //     internal
-    //     pure
-    //     returns (bytes32)
-    // {
-    //     return keccak256(abi.encodePacked(_prefix, _address));
-    // }
-
-    // function _verify(bytes32 hash, bytes memory signature)
-    //     internal
-    //     view
-    //     returns (bool)
-    // {
-    //     return (_recover(hash, signature) == owner());
-    // }
-
-    // function _recover(bytes32 hash, bytes memory signature)
-    //     internal
-    //     pure
-    //     returns (address)
-    // {
-    //     return hash.recover(signature);
-    // }
+    function withdraw() external onlyOwner {
+        (bool success, bytes memory returnData) = payable(msg.sender).call{
+                value: address(this).balance
+            }("");
+    }
 }

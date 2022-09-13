@@ -2,23 +2,27 @@
 pragma solidity ^0.8.9;
 
 // Import this file to use console.log
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
+
 import './RandomlyAssigned.sol';
 
 interface IPack {
     function burnPack(uint256 _tokenId) external returns(bool);
     function ownerOf(uint256 tokenId) external view returns (address);
 }
-contract Card is ERC1155, Ownable {
-    address public immutable packContract;
+contract Card is ERC1155Upgradeable, OwnableUpgradeable {
+    address public packContract;
 
     string[] uris;
 
     RandomlyAssigned public characterRandomlyAssigned;
     RandomlyAssigned public landEneryRandomlyAssigned;
 
-    constructor(address _packContract, string[] memory _uris)  ERC1155("") {
+    function initialize(address _packContract, string[] memory _uris)  public initializer {
+        __ERC1155_init("");
+        __Ownable_init();
         uris = _uris;
         packContract = _packContract;
 

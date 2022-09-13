@@ -1,11 +1,6 @@
-const {
-  time,
-  loadFixture,
-} = require("@nomicfoundation/hardhat-network-helpers");
-const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const { parseEther, keccak256 } = require("ethers/lib/utils");
-const { BigNumber } = require("ethers");
+const { ethers, upgrades  } = require("hardhat");
 const {MerkleTree} = require("merkletreejs");
 
 
@@ -33,16 +28,17 @@ describe("Test Card contract", function () {
     CardContract = await ethers.getContractFactory("Card");
   })
   beforeEach(async function () {
-    packContract = await PackContract.deploy();
+    packContract = await upgrades.deployProxy(PackContract, [], {});
+    console.log("deploying")
     await packContract.deployed();
+    console.log("pack deployed")
 
     const merkleRoot = tree.getHexRoot()
     await packContract.setMerkleRoot(merkleRoot);
 
-    cardContract = await CardContract.deploy(packContract.address, URIs);
+    cardContract = await upgrades.deployProxy(CardContract, [owner.address, URIs]);
     await cardContract.deployed();
-
-    packContract.setCardContract(cardContract.address);
+     packContract.setCardContract(cardContract.address);
 
   })
   it("Should only whitelist mint 5 pack token", async function () {     

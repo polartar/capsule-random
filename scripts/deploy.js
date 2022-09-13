@@ -7,14 +7,14 @@ async function main() {
   const uris = ["https://commonuri", "https://rareuri", "https://legendaryuri", "https://landuri"]
 
   const Pack = await hre.ethers.getContractFactory("Pack");
-  const pack = await Pack.deploy();
+  const pack = await hre.upgrades.deployProxy(Pack, []);
 
   await pack.deployed();
 
   console.log(`Pack deployed to ${pack.address}`);
 
   const Card = await hre.ethers.getContractFactory("Card");
-  const card = await Card.deploy(pack.address, uris);
+  const card = await hre.upgrades.deployProxy(Card, [pack.address, uris]);
 
   await card.deployed();
 

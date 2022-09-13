@@ -1,4 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
+require('@openzeppelin/hardhat-upgrades');
 
 
 const KEY_FILE = require("./PRIVATE_KEY.json");
