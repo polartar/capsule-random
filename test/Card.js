@@ -64,31 +64,31 @@ describe("Test Card contract", function () {
     expect((await packContract.balanceOf(user.address)).toNumber()).to.equal(5);
   });
 
-  // it("Should mint 4200 packs and mint random cards", async function () {     
-  //   await packContract.mintReserved(user.address, 4200);
-  //   expect((await packContract.balanceOf(user.address)).toNumber()).to.equal(4200);
-  //   console.log("4200 tokens minted")
-  //   for (let i = 0; i < 4200; i++) {
-  //     await cardContract.connect(user).burnPack(i);
-  //   }
+  it("Should mint 4200 packs and mint random cards", async function () {     
+    await packContract.mintReserved(user.address, 4200);
+    expect((await packContract.balanceOf(user.address)).toNumber()).to.equal(4200);
+    console.log("4200 tokens minted")
+    for (let i = 0; i < 4200; i++) {
+      await cardContract.connect(user).burnPack(i);
+    }
 
-  //   expect((await packContract.balanceOf(user.address)).toNumber()).to.equal(0);
-  //   expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 1)).toNumber()).to.equal(700);
-  //   expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 2)).toNumber()).to.equal(700);
-  //   expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 3)).toNumber()).to.equal(700);
-  //   expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 4)).toNumber()).to.equal(700);
-  //   expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 5)).toNumber()).to.equal(700);
-  //   expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 6)).toNumber()).to.equal(700);
-  // });
+    expect((await packContract.balanceOf(user.address)).toNumber()).to.equal(0);
+    expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 1)).toNumber()).to.equal(700);
+    expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 2)).toNumber()).to.equal(700);
+    expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 3)).toNumber()).to.equal(700);
+    expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 4)).toNumber()).to.equal(700);
+    expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 5)).toNumber()).to.equal(700);
+    expect((await cardContract.balanceOf(user.address, 130 + 65 + 8 + 6)).toNumber()).to.equal(700);
+  });
 
-  //  it("Should not mint 4201 packs due to lack of land/energy token", async function () {     
-  //   await packContract.mintReserved(user.address, 4201);
-  //   expect((await packContract.balanceOf(user.address)).toNumber()).to.equal(4201);
+   it("Should not mint 4201 packs due to lack of land/energy token", async function () {     
+    await packContract.mintReserved(user.address, 4201);
+    expect((await packContract.balanceOf(user.address)).toNumber()).to.equal(4201);
     
-  //   for (let i = 0; i < 4200; i++) {
-  //     await cardContract.connect(user).burnPack(i);
-  //   }
-  //   await expect(cardContract.connect(user).burnPack(4200)).reverted;
+    for (let i = 0; i < 4200; i++) {
+      await cardContract.connect(user).burnPack(i);
+    }
+    await expect(cardContract.connect(user).burnPack(4200)).reverted;
 
-  // });
+  });
 });
