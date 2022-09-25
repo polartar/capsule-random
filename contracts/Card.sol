@@ -13,21 +13,32 @@ interface IPack {
     function ownerOf(uint256 tokenId) external view returns (address);
 }
 contract Card is ERC1155Upgradeable, OwnableUpgradeable {
-    address public packContract;
+    uint8 constant COMMON_1_SUPPLY = 150;
+    uint8 constant COMMON_2_SUPPLY = 100;
+    uint8 constant COMMON_3_SUPPLY = 25;
+    uint8 constant RARE_SUPPLY = 50;
+    uint8 constant LEGENDARY_SUPPLY = 10;
+    uint8 constant MYTHICS_SUPPLY = 5;
 
+    uint8 constant COMMON_1_COUNT = 6;
+    uint8 constant COMMON_2_COUNT = 141;
+    uint8 constant COMMON_3_COUNT = 27;
+    uint8 constant RARE_COUNT = 141;
+    uint8 constant LEGENDARY_COUNT = 8;
+    uint8 constant MYTHICS_COUNT = 2;
+    
+    address public packContract;
     string[] uris;
 
     RandomlyAssigned public characterRandomlyAssigned;
-    RandomlyAssigned public landEneryRandomlyAssigned;
 
     function initialize(address _packContract, string[] memory _uris)  public initializer {
         __ERC1155_init("");
         __Ownable_init();
         uris = _uris;
         packContract = _packContract;
-
-        characterRandomlyAssigned = new RandomlyAssigned(130 * 60 + 65 * 75 + 8 * 10, address(this));
-        landEneryRandomlyAssigned = new RandomlyAssigned(6 * 700, address(this));
+        uint256 totalSupply = COMMON_1_COUNT * COMMON_1_SUPPLY + COMMON_2_COUNT * COMMON_2_SUPPLY + COMMON_3_COUNT * COMMON_3_SUPPLY + RARE_COUNT * RARE_SUPPLY + LEGENDARY_COUNT * LEGENDARY_SUPPLY + MYTHICS_COUNT * MYTHICS_SUPPLY;
+        characterRandomlyAssigned = new RandomlyAssigned(totalSupply, address(this));
     }
 
     function burnPack(uint256 _packId) public {
@@ -38,26 +49,38 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable {
     }
 
     function _mintCards() private {
-        uint256 randomLandNumber = landEneryRandomlyAssigned.nextToken();
-        uint256 landTokenId = randomLandNumber % 6 + 130 + 65 + 8 + 1;
-         _mint(msg.sender, landTokenId, 1, "");
-
         for (uint256 i = 0; i < 3; i++) {
             uint256 randomCharacterNumber = characterRandomlyAssigned.nextToken();
             uint256 characterTokenId;
-            if (randomCharacterNumber <= 130 * 56) {
-                characterTokenId = randomCharacterNumber % 130 + 1;
-            } else if (randomCharacterNumber <= 130 * 56 + 65 * 75) {
-                characterTokenId = randomCharacterNumber % 65 + 130 + 1;
-            } else {
-                characterTokenId = randomCharacterNumber % 8 + 130 + 65 + 1;
 
+            uint256 common1_lastNumber = COMMON_1_COUNT * COMMON_1_SUPPLY;
+            uint256 common2_lastNumber = common1_lastNumber + COMMON_2_COUNT * COMMON_2_SUPPLY;
+            uint256 common3_lastNumber = common2_lastNumber + COMMON_3_COUNT * COMMON_3_SUPPLY;
+            uint256 rare_lastNumber = common3_lastNumber + RARE_COUNT * RARE_SUPPLY;
+            uint256 legendary_lastNumber = rare_lastNumber + LEGENDARY_COUNT * LEGENDARY_SUPPLY;
+            uint256 mythics_lastNumber = legendary_lastNumber + MYTHICS_COUNT * MYTHICS_SUPPLY;
+
+
+            if (randomCharacterNumber <= common1_lastNumber) {
+                characterTokenId = randomCharacterNumber % COMMON_1_SUPPLY + 1;
+            } else if (randomCharacterNumber <= common2_lastNumber) {
+                characterTokenId = randomCharacterNumber % COMMON_2_SUPPLY + 1 + COMMON_1_COUNT;
+            } else if (randomCharacterNumber <= common3_lastNumber)  {
+                characterTokenId = randomCharacterNumber % COMMON_3_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT;
+            } else if (randomCharacterNumber <= rare_lastNumber) {
+                characterTokenId = randomCharacterNumber % RARE_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT;
+            } else if (randomCharacterNumber <= legendary_lastNumber) {
+                characterTokenId = randomCharacterNumber % LEGENDARY_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT;
+            } else if (randomCharacterNumber <= mythics_lastNumber) {
+                characterTokenId = randomCharacterNumber % MYTHICS_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT + LEGENDARY_COUNT;
             }
+
             _mint(msg.sender, characterTokenId, 1, "");
         }
     }
 
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {
+        // need more discusstion about the tokenID
         if (1 <= _tokenId && _tokenId <= 130) {
             return uris[0];
         } else if ( _tokenId <= 195) {
