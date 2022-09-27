@@ -12,7 +12,6 @@ import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
     string[] uris;
     using ECDSA for bytes32;
-    string public constant prefix = "Base Verification:";
     mapping(address => bool) hasClaimed;
 
     function initialize(string[] memory _uris)  public initializer {
@@ -24,11 +23,12 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
 
     function mint(
         bytes32 hash,
-        bytes memory signature
+        bytes memory signature,
+        uint256 _time
     ) external payable whenNotPaused{
         require(_verify(hash, signature), "Signature invalid.");
         require(
-            _hash(msg.sender) == hash,
+            _hash(msg.sender, _time) == hash,
             "Hash invalid."
         );
         require(!hasClaimed[msg.sender], "You have already claimed your cards.");
@@ -67,8 +67,8 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
         uris = _newURIs;
     }
 
-    function _hash(address _address) private pure returns (bytes32) {
-        return keccak256(abi.encodePacked(prefix, _address));
+    function _hash(address _address, uint256 _time) private pure returns (bytes32) {
+        return keccak256(abi.encodePacked(_address, _time));
     }
 
     function _verify(bytes32 hash, bytes memory signature)

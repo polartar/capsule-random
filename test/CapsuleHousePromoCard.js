@@ -6,13 +6,12 @@ const { ethers, upgrades  } = require("hardhat");
 // const getTokenIdsFromRecipient = (recipient) => {
 //   return recipient.logs.filter((log, index) => index > 0).map(log => BigNumber.from(log.topics[3]).toNumber())
 // }
-  const HASH_PREFIX = "Base Verification:";
-function getHash(message, address) {
+function getHash(address, time) {
   let messageHash;
  
     messageHash = ethers.utils.solidityKeccak256(
-      ["string", "address"],
-      [message, address]
+      ["address", "uint256"],
+      [address, time]
   );
  
   let messageHashBinary = ethers.utils.arrayify(messageHash);
@@ -37,36 +36,39 @@ describe("Test CapsuleHousePromoCard contract", function () {
   })
 
   it("cannot mint whitelist with a bad signature", async function () {
-    const hash = getHash(HASH_PREFIX, owner.address);
+    const now = new Date().getTime();
+
+    const hash = getHash(owner.address, now);
 
     const otherSignature = await other.signMessage(hash);
    
     await expect(
-      capsuleCard.mint(hash, otherSignature)
+      capsuleCard.mint(hash, otherSignature, now)
     ).to.be.revertedWith("Signature invalid.");
   });
 
   it("cannot mint whitelist with bad hash", async function () {
-
-    const badPrefixHash = getHash("bad", owner.address);
-    const badAddressHash = getHash(HASH_PREFIX, other.address);
+    const now = new Date().getTime();
+    const badTimeHash = getHash(owner.address, now + 1);
+    const badAddressHash = getHash(other.address, now);
  
-    const badPrefixSignature = await owner.signMessage(badPrefixHash);
+    const badPrefixSignature = await owner.signMessage(badTimeHash);
     const badAddressSignature = await owner.signMessage(badAddressHash);
 
     await expect(
-      capsuleCard.mint(badPrefixHash, badPrefixSignature)
+      capsuleCard.mint(badTimeHash, badPrefixSignature, now)
     ).to.be.revertedWith("Hash invalid.");
     
     await expect(
-      capsuleCard.mint(badAddressHash, badAddressSignature)
+      capsuleCard.mint(badAddressHash, badAddressSignature, now)
     ).to.be.revertedWith("Hash invalid.");
   });
 
   it("can mint whitelist", async function () {
-    const hash = getHash(HASH_PREFIX, owner.address);
+    const now = new Date().getTime();
+    const hash = getHash(owner.address, now);
     const ownerSignature = await owner.signMessage(hash);
 
-    await capsuleCard.mint(hash, ownerSignature);
+    await capsuleCard.mint(hash, ownerSignature, now);
   });
 });
