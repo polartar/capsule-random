@@ -5,6 +5,7 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
+import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 
 import './RandomlyAssigned.sol';
 
@@ -12,7 +13,7 @@ interface IPack {
     function burnPack(uint256 _tokenId) external returns(bool);
     function ownerOf(uint256 tokenId) external view returns (address);
 }
-contract Card is ERC1155Upgradeable, OwnableUpgradeable {
+contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
     uint8 constant COMMON_1_SUPPLY = 150;
     uint8 constant COMMON_2_SUPPLY = 100;
     uint8 constant COMMON_3_SUPPLY = 25;
@@ -35,13 +36,14 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable {
     function initialize(address _packContract, string[] memory _uris)  public initializer {
         __ERC1155_init("");
         __Ownable_init();
+        __Pausable_init();
         uris = _uris;
         packContract = _packContract;
         uint256 totalSupply = COMMON_1_COUNT * COMMON_1_SUPPLY + COMMON_2_COUNT * COMMON_2_SUPPLY + COMMON_3_COUNT * COMMON_3_SUPPLY + RARE_COUNT * RARE_SUPPLY + LEGENDARY_COUNT * LEGENDARY_SUPPLY + MYTHICS_COUNT * MYTHICS_SUPPLY;
         characterRandomlyAssigned = new RandomlyAssigned(totalSupply, address(this));
     }
 
-    function burnPack(uint256 _packId) public {
+    function burnPack(uint256 _packId) public whenNotPaused{
         require(IPack(packContract).ownerOf(_packId) == msg.sender, "You are not the owner of this pack");
         if (!IPack(packContract).burnPack(_packId)) revert ("failed to burn pack");
 

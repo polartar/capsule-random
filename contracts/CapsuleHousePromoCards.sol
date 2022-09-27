@@ -6,9 +6,10 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 
 
-contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable {
+contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
     string[] uris;
     using ECDSA for bytes32;
     string public constant prefix = "Base Verification:";
@@ -16,6 +17,7 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable {
 
     function initialize(string[] memory _uris)  public initializer {
         __ERC1155_init("");
+        __Pausable_init();
         __Ownable_init();
         uris = _uris;
     }
@@ -23,7 +25,7 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable {
     function mint(
         bytes32 hash,
         bytes memory signature
-    ) external payable {
+    ) external payable whenNotPaused{
         require(_verify(hash, signature), "Signature invalid.");
         require(
             _hash(msg.sender) == hash,
@@ -55,7 +57,10 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable {
     }
 
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {
-         
+        require(_tokenId < uris.length, "URI query for nonexistent token");
+        require(_tokenId > 0, "URI query for nonexistent token");
+        
+        return uris[_tokenId];
     }
 
     function setURIs(string[] memory _newURIs) public onlyOwner {
