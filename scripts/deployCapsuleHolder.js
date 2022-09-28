@@ -9,6 +9,7 @@ async function main() {
 
   const CapsuleHousePromoCard = await hre.ethers.getContractFactory("CapsuleHousePromoCard");
   const card = await hre.upgrades.deployProxy(CapsuleHousePromoCard, [uris]);
+  // const card = await hre.upgrades.upgradeProxy("0x9d93cB1A1267956daC7f8B81896C5806D4C07cb7", CapsuleHousePromoCard);
 
   await card.deployed();
 
