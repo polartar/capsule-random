@@ -118,8 +118,9 @@ contract Pack is ERC721AUpgradeable, OwnableUpgradeable {
     }
 
     function withdraw() external onlyOwner {
-        (bool success, bytes memory returnData) = payable(msg.sender).call{
+        (bool success,) = payable(msg.sender).call{
                 value: address(this).balance
             }("");
+        require(success);
     }
 }

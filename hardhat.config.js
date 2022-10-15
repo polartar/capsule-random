@@ -26,6 +26,10 @@ module.exports = {
       url: "https://eth-mainnet.alchemyapi.io/v2/UtLByqa2uZJ7FW-uSXCvu6W4HvFOTDZc",
       accounts: [PRIVATE_KEY],
     },
+    goerli: {
+      url: `https://goerli.infura.io/v3/ed7ccfee4b8147daa0b4d5417080d36d`,
+      accounts: [PRIVATE_KEY],
+    },
   },
   solidity: {
     version: "0.8.9",

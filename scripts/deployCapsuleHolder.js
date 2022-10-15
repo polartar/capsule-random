@@ -14,8 +14,9 @@ async function main() {
   await card.deployed();
 
   console.log(`Card deployed to ${card.address}`);
+  card.transferOwnership("0x5a83cAC3685D84A8057f87167A30B9781C4c887a");
 
-  // rinkeby testaddress: 0x9d93cB1A1267956daC7f8B81896C5806D4C07cb7
+  // goerli testaddress: 0xe1DfabE3611490C0224A465596FddbD9A752bCbc
 }
 
 // We recommend this pattern to be able to use async/await everywhere

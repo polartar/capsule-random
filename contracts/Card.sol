@@ -14,19 +14,19 @@ interface IPack {
     function ownerOf(uint256 tokenId) external view returns (address);
 }
 contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
-    uint8 constant COMMON_1_SUPPLY = 150;
-    uint8 constant COMMON_2_SUPPLY = 100;
-    uint8 constant COMMON_3_SUPPLY = 25;
-    uint8 constant RARE_SUPPLY = 50;
-    uint8 constant LEGENDARY_SUPPLY = 10;
-    uint8 constant MYTHICS_SUPPLY = 5;
+    uint256 constant COMMON_1_SUPPLY = 150;
+    uint256 constant COMMON_2_SUPPLY = 100;
+    uint256 constant COMMON_3_SUPPLY = 25;
+    uint256 constant RARE_SUPPLY = 50;
+    uint256 constant LEGENDARY_SUPPLY = 10;
+    uint256 constant MYTHICS_SUPPLY = 5;
 
-    uint8 constant COMMON_1_COUNT = 6;
-    uint8 constant COMMON_2_COUNT = 141;
-    uint8 constant COMMON_3_COUNT = 27;
-    uint8 constant RARE_COUNT = 141;
-    uint8 constant LEGENDARY_COUNT = 8;
-    uint8 constant MYTHICS_COUNT = 2;
+    uint256 constant COMMON_1_COUNT = 6;
+    uint256 constant COMMON_2_COUNT = 141;
+    uint256 constant COMMON_3_COUNT = 27;
+    uint256 constant RARE_COUNT = 141;
+    uint256 constant LEGENDARY_COUNT = 8;
+    uint256 constant MYTHICS_COUNT = 2;
     
     address public packContract;
     string[] uris;

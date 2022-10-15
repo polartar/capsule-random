@@ -21,16 +21,6 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
         uris = _uris;
     }
 
-    function mintForTest() public whenNotPaused{
-        require(!hasClaimed[msg.sender], "You have already claimed your cards.");
-        hasClaimed[msg.sender] = true;
-
-        uint256 id1 = generateRandomNumber(0) ;
-        uint256 id2 = generateRandomNumber(id1);
-        _mint(msg.sender, id1 % 12, 1, "");
-        _mint(msg.sender, id2 % 12, 1, "");
-    }
-
     function mint(
         bytes32 hash,
         bytes memory signature,
