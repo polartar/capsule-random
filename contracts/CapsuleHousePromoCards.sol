@@ -62,7 +62,6 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
 
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_tokenId < uris.length, "URI query for nonexistent token");
-        require(_tokenId > 0, "URI query for nonexistent token");
         
         return uris[_tokenId];
     }
