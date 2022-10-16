@@ -36,8 +36,8 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
 
         uint256 id1 = generateRandomNumber(0) ;
         uint256 id2 = generateRandomNumber(id1);
-        _mint(msg.sender, id1 % 12, 1, "");
-        _mint(msg.sender, id2 % 12, 1, "");
+        _mint(msg.sender, id1 % 12 +1, 1, "");
+        _mint(msg.sender, id2 % 12 + 1, 1, "");
     }
 
     function isClaimed(address _address) public view returns(bool){

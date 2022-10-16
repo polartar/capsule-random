@@ -64,17 +64,17 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
 
 
             if (randomCharacterNumber <= common1_lastNumber) {
-                characterTokenId = randomCharacterNumber % COMMON_1_SUPPLY + 1;
+                characterTokenId = randomCharacterNumber % COMMON_1_COUNT + 1;
             } else if (randomCharacterNumber <= common2_lastNumber) {
-                characterTokenId = randomCharacterNumber % COMMON_2_SUPPLY + 1 + COMMON_1_COUNT;
+                characterTokenId = randomCharacterNumber % COMMON_2_COUNT + 1 + COMMON_1_COUNT;
             } else if (randomCharacterNumber <= common3_lastNumber)  {
-                characterTokenId = randomCharacterNumber % COMMON_3_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT;
+                characterTokenId = randomCharacterNumber % COMMON_3_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT;
             } else if (randomCharacterNumber <= rare_lastNumber) {
-                characterTokenId = randomCharacterNumber % RARE_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT;
+                characterTokenId = randomCharacterNumber % RARE_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT;
             } else if (randomCharacterNumber <= legendary_lastNumber) {
-                characterTokenId = randomCharacterNumber % LEGENDARY_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT;
+                characterTokenId = randomCharacterNumber % LEGENDARY_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT;
             } else if (randomCharacterNumber <= mythics_lastNumber) {
-                characterTokenId = randomCharacterNumber % MYTHICS_SUPPLY + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT + LEGENDARY_COUNT;
+                characterTokenId = randomCharacterNumber % MYTHICS_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT + LEGENDARY_COUNT;
             }
 
             _mint(msg.sender, characterTokenId, 1, "");
