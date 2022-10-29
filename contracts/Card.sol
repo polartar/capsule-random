@@ -30,6 +30,9 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
     
     address public packContract;
     string[] uris;
+    // wallet => tokenId => amount
+    mapping(address => mapping(uint256 => uint256)) mintedAmounts;
+    mapping(uint256 => address[]) twoMintedAddresses;
 
     RandomlyAssigned public characterRandomlyAssigned;
 
@@ -77,8 +80,16 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
                 characterTokenId = randomCharacterNumber % MYTHICS_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT + LEGENDARY_COUNT;
             }
 
+             mintedAmounts[msg.sender][characterTokenId] += 1;
+             if (mintedAmounts[msg.sender][characterTokenId] >= 2) {
+                    twoMintedAddresses[characterTokenId].push(msg.sender);
+             }
             _mint(msg.sender, characterTokenId, 1, "");
         }
+    }
+
+    function getTwoMintedAddresses(uint256 _tokenId) public view returns(address[] memory) {
+        return twoMintedAddresses[_tokenId];
     }
 
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {

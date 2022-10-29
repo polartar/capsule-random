@@ -14,6 +14,8 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
     using ECDSA for bytes32;
     mapping(address => bool) hasClaimed;
 
+    
+
     function initialize(string[] memory _uris)  public initializer {
         __ERC1155_init("");
         __Pausable_init();
@@ -36,8 +38,21 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
 
         uint256 id1 = generateRandomNumber(0) ;
         uint256 id2 = generateRandomNumber(id1);
-        _mint(msg.sender, id1 % 12 +1, 1, "");
-        _mint(msg.sender, id2 % 12 + 1, 1, "");
+        _mint(msg.sender, id1 % 12, 1, "");
+        _mint(msg.sender, id2 % 12, 1, "");
+    }
+
+    function mintWhitelist(address[] memory _addresses) external onlyOwner {
+        uint256[] memory ids = new uint256[](12);
+        uint256[] memory amounts = new uint256[](12);
+
+        for (uint256 i = 0; i < 12; i ++ ){
+            ids[i] = i + 1;
+            amounts[i] = 1;
+        }
+        for (uint256 i = 0; i < _addresses.length; i++) {
+            _mintBatch(_addresses[i], ids, amounts, "");
+        }
     }
 
     function isClaimed(address _address) public view returns(bool){
@@ -62,7 +77,6 @@ contract CapsuleHousePromoCard is ERC1155Upgradeable, OwnableUpgradeable, Pausab
 
     function uri(uint256 _tokenId) public view virtual override returns (string memory) {
         require(_tokenId < uris.length, "URI query for nonexistent token");
-        
         return uris[_tokenId];
     }
 
