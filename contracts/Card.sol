@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
+import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 
 import './RandomlyAssigned.sol';
 
@@ -13,7 +14,7 @@ interface IPack {
     function burnPack(uint256 _tokenId) external returns(bool);
     function ownerOf(uint256 tokenId) external view returns (address);
 }
-contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
+contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ERC2981Upgradeable {
     uint256 constant COMMON_1_SUPPLY = 150;
     uint256 constant COMMON_2_SUPPLY = 100;
     uint256 constant COMMON_3_SUPPLY = 25;
@@ -109,5 +110,13 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable {
 
     function setURIs(string[] memory _newURIs) public onlyOwner {
         uris = _newURIs;
+    }
+
+    function setTokenRoyalty(uint256 tokenId, address receiver, uint96 feeNumerator) external onlyOwner {
+        _setTokenRoyalty(tokenId, receiver, feeNumerator);
+    }
+
+     function supportsInterface(bytes4 interfaceId) public view override(ERC1155Upgradeable, ERC2981Upgradeable) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 }
