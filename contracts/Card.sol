@@ -87,6 +87,9 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
              }
             _mint(msg.sender, characterTokenId, 1, "");
         }
+
+        // thanks card
+        _mint(msg.sender, 326, 1, "");
     }
 
     function getTwoMintedAddresses(uint256 _tokenId) public view returns(address[] memory) {
@@ -99,12 +102,12 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
             return uris[0];
         } else if ( _tokenId <= 195) {
             return uris[1];
-        } else if ( _tokenId <= 203) { 
+        } else if ( _tokenId <= 250) { 
             return uris[2];
-        } else if (_tokenId <= 209) {
+        } else if (_tokenId <= 325) {
             return uris[3];
         } else {
-            revert("invalid token id");
+            return uris[4];
         }
     }
 
