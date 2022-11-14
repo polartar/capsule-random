@@ -7,33 +7,44 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 
 import './RandomlyAssigned.sol';
 
 interface IPack {
     function burnPack(uint256 _tokenId) external returns(bool);
+    function burn(uint256 _tokenId) external;
     function ownerOf(uint256 tokenId) external view returns (address);
 }
 contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ERC2981Upgradeable {
-    uint256 constant COMMON_1_SUPPLY = 150;
-    uint256 constant COMMON_2_SUPPLY = 100;
-    uint256 constant COMMON_3_SUPPLY = 25;
-    uint256 constant RARE_SUPPLY = 50;
+    using StringsUpgradeable for uint256;
+
+    uint256 constant COMMON_1_SUPPLY = 125;
+    uint256 constant RARE_1_SUPPLY = 25;
+    uint256 constant RARE_2_SUPPLY = 50;
     uint256 constant LEGENDARY_SUPPLY = 10;
     uint256 constant MYTHICS_SUPPLY = 5;
 
-    uint256 constant COMMON_1_COUNT = 6;
-    uint256 constant COMMON_2_COUNT = 141;
-    uint256 constant COMMON_3_COUNT = 27;
-    uint256 constant RARE_COUNT = 141;
-    uint256 constant LEGENDARY_COUNT = 8;
-    uint256 constant MYTHICS_COUNT = 2;
+    uint256 constant COMMON_1_COUNT = 146;
+    uint256 constant RARE_1_COUNT = 198;
+    uint256 constant RARE_2_COUNT = 18;
+    uint256 constant LEGENDARY_COUNT = 40;
+    uint256 constant MYTHICS_COUNT = 8;
     
     address public packContract;
     string[] uris;
-    // wallet => tokenId => amount
+
+    uint256 common1_lastNumber;
+    uint256 rare1_lastNumber;
+    uint256 rare2_lastNumber;
+    uint256 legendary_lastNumber;
+    uint256 mythics_lastNumber;
+    uint256 total_supply;
+
     mapping(address => mapping(uint256 => uint256)) mintedAmounts;
     mapping(uint256 => address[]) twoMintedAddresses;
+
+    string baseURI;
 
     RandomlyAssigned public characterRandomlyAssigned;
 
@@ -43,13 +54,20 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
         __Pausable_init();
         uris = _uris;
         packContract = _packContract;
-        uint256 totalSupply = COMMON_1_COUNT * COMMON_1_SUPPLY + COMMON_2_COUNT * COMMON_2_SUPPLY + COMMON_3_COUNT * COMMON_3_SUPPLY + RARE_COUNT * RARE_SUPPLY + LEGENDARY_COUNT * LEGENDARY_SUPPLY + MYTHICS_COUNT * MYTHICS_SUPPLY;
-        characterRandomlyAssigned = new RandomlyAssigned(totalSupply, address(this));
+       
+        common1_lastNumber = COMMON_1_COUNT * COMMON_1_SUPPLY;
+        rare1_lastNumber = common1_lastNumber + RARE_1_COUNT * RARE_1_SUPPLY;
+        rare2_lastNumber = rare1_lastNumber + RARE_2_COUNT * RARE_2_SUPPLY;
+        legendary_lastNumber = rare2_lastNumber + LEGENDARY_COUNT * LEGENDARY_SUPPLY;
+        mythics_lastNumber = legendary_lastNumber + MYTHICS_COUNT * MYTHICS_SUPPLY;
+        
+        total_supply = COMMON_1_COUNT + RARE_1_COUNT + RARE_2_COUNT + LEGENDARY_COUNT + MYTHICS_COUNT + 1;  // including thanks card
+        characterRandomlyAssigned = new RandomlyAssigned(mythics_lastNumber, address(this));
     }
 
     function burnPack(uint256 _packId) public whenNotPaused{
         require(IPack(packContract).ownerOf(_packId) == msg.sender, "You are not the owner of this pack");
-        if (!IPack(packContract).burnPack(_packId)) revert ("failed to burn pack");
+        IPack(packContract).burn(_packId);
 
         _mintCards();
     }
@@ -59,26 +77,16 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
             uint256 randomCharacterNumber = characterRandomlyAssigned.nextToken();
             uint256 characterTokenId;
 
-            uint256 common1_lastNumber = COMMON_1_COUNT * COMMON_1_SUPPLY;
-            uint256 common2_lastNumber = common1_lastNumber + COMMON_2_COUNT * COMMON_2_SUPPLY;
-            uint256 common3_lastNumber = common2_lastNumber + COMMON_3_COUNT * COMMON_3_SUPPLY;
-            uint256 rare_lastNumber = common3_lastNumber + RARE_COUNT * RARE_SUPPLY;
-            uint256 legendary_lastNumber = rare_lastNumber + LEGENDARY_COUNT * LEGENDARY_SUPPLY;
-            uint256 mythics_lastNumber = legendary_lastNumber + MYTHICS_COUNT * MYTHICS_SUPPLY;
-
-
             if (randomCharacterNumber <= common1_lastNumber) {
                 characterTokenId = randomCharacterNumber % COMMON_1_COUNT + 1;
-            } else if (randomCharacterNumber <= common2_lastNumber) {
-                characterTokenId = randomCharacterNumber % COMMON_2_COUNT + 1 + COMMON_1_COUNT;
-            } else if (randomCharacterNumber <= common3_lastNumber)  {
-                characterTokenId = randomCharacterNumber % COMMON_3_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT;
-            } else if (randomCharacterNumber <= rare_lastNumber) {
-                characterTokenId = randomCharacterNumber % RARE_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT;
+            } else if (randomCharacterNumber <= rare1_lastNumber) {
+                characterTokenId = randomCharacterNumber % RARE_1_COUNT + 1 + COMMON_1_COUNT;
+            } else if (randomCharacterNumber <= rare2_lastNumber) {
+                characterTokenId = randomCharacterNumber % RARE_2_COUNT + 1 + COMMON_1_COUNT + RARE_1_COUNT;
             } else if (randomCharacterNumber <= legendary_lastNumber) {
-                characterTokenId = randomCharacterNumber % LEGENDARY_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT;
-            } else if (randomCharacterNumber <= mythics_lastNumber) {
-                characterTokenId = randomCharacterNumber % MYTHICS_COUNT + 1 + COMMON_1_COUNT + COMMON_2_COUNT + COMMON_3_COUNT + RARE_COUNT + LEGENDARY_COUNT;
+                characterTokenId = randomCharacterNumber % LEGENDARY_COUNT + 1 + COMMON_1_COUNT + RARE_1_COUNT + RARE_2_COUNT;
+            } else {
+                characterTokenId = randomCharacterNumber % MYTHICS_COUNT + 1 + COMMON_1_COUNT + RARE_1_COUNT + RARE_2_COUNT + LEGENDARY_COUNT;
             }
 
              mintedAmounts[msg.sender][characterTokenId] += 1;
@@ -89,30 +97,19 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
         }
 
         // thanks card
-        _mint(msg.sender, 326, 1, "");
+        _mint(msg.sender, total_supply , 1, "");
     }
 
     function getTwoMintedAddresses(uint256 _tokenId) public view returns(address[] memory) {
         return twoMintedAddresses[_tokenId];
     }
 
-    function uri(uint256 _tokenId) public view virtual override returns (string memory) {
-        // need more discusstion about the tokenID
-        if (1 <= _tokenId && _tokenId <= 130) {
-            return uris[0];
-        } else if ( _tokenId <= 195) {
-            return uris[1];
-        } else if ( _tokenId <= 250) { 
-            return uris[2];
-        } else if (_tokenId <= 325) {
-            return uris[3];
-        } else {
-            return uris[4];
-        }
+    function uri(uint256 tokenId) public view virtual override returns (string memory) {
+        return string(abi.encodePacked(baseURI, tokenId.toString()));
     }
 
-    function setURIs(string[] memory _newURIs) public onlyOwner {
-        uris = _newURIs;
+    function setBaseURI(string memory _newURI) public onlyOwner {
+        baseURI = _newURI;
     }
 
     function setTokenRoyalty(uint256 tokenId, address receiver, uint96 feeNumerator) external onlyOwner {
