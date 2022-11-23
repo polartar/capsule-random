@@ -27,7 +27,8 @@ module.exports = {
       accounts: [PRIVATE_KEY],
     },
     goerli: {
-      url: `https://goerli.infura.io/v3/ed7ccfee4b8147daa0b4d5417080d36d`,
+      // url: `https://goerli.infura.io/v3/ed7ccfee4b8147daa0b4d5417080d36d`,
+      url: `https://eth-goerli.g.alchemy.com/v2/Q-HKc0yjwSYLjqQFTB8dpOzlACsxGl6R`,
       accounts: [PRIVATE_KEY],
     },
   },

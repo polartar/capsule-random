@@ -32,7 +32,6 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
     uint256 constant MYTHICS_COUNT = 8;
     
     address public packContract;
-    string[] uris;
 
     uint256 common1_lastNumber;
     uint256 rare1_lastNumber;
@@ -48,11 +47,10 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
 
     RandomlyAssigned public characterRandomlyAssigned;
 
-    function initialize(address _packContract, string[] memory _uris)  public initializer {
+    function initialize(address _packContract)  public initializer {
         __ERC1155_init("");
         __Ownable_init();
         __Pausable_init();
-        uris = _uris;
         packContract = _packContract;
        
         common1_lastNumber = COMMON_1_COUNT * COMMON_1_SUPPLY;
@@ -97,7 +95,7 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
         }
 
         // thanks card
-        _mint(msg.sender, total_supply , 1, "");
+        // _mint(msg.sender, total_supply , 1, "");
     }
 
     function getTwoMintedAddresses(uint256 _tokenId) public view returns(address[] memory) {
@@ -105,7 +103,7 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
     }
 
     function uri(uint256 tokenId) public view virtual override returns (string memory) {
-        return string(abi.encodePacked(baseURI, tokenId.toString()));
+        return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
     }
 
     function setBaseURI(string memory _newURI) public onlyOwner {

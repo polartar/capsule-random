@@ -4,11 +4,12 @@ const {MerkleTree} = require("merkletreejs");
 const whitelist = require("../whitelist.json");
 
 async function main() {
-  const uris = ["ipfs://QmViifgtNS3miRuPfePyLz4NQhLfMtxSs3iJThuXdisyZ1/1.json", "ipfs://QmViifgtNS3miRuPfePyLz4NQhLfMtxSs3iJThuXdisyZ1/2.json", "ipfs://QmViifgtNS3miRuPfePyLz4NQhLfMtxSs3iJThuXdisyZ1/3.json", "ipfs://QmViifgtNS3miRuPfePyLz4NQhLfMtxSs3iJThuXdisyZ1/4.json", "ipfs://QmViifgtNS3miRuPfePyLz4NQhLfMtxSs3iJThuXdisyZ1/5.json"]
+  const [deployer] = await ethers.getSigners();
+    // console.log("upgrading",deployer.address)
  const Card = await hre.ethers.getContractFactory("Card");
-  const card = await hre.upgrades.upgradeProxy("0x816C99843EbcDcE2d247Cec7F3f5F3972D14070C", Card);
+  const card = await hre.upgrades.upgradeProxy("0x65F2d1439b0D37d216F8E11945A3Ee02D51B4b2f", Card);
   console.log("upgraded: ", card.address)
-  await card.setURIs(uris);
+  // await card.setBaseURI("ipfs://QmTdPPuyz8QecxZyvhTyekJeiQn1HmXG5pTstp6YWyBqhr/");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
