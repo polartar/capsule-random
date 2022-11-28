@@ -59,7 +59,7 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
         legendary_lastNumber = rare2_lastNumber + LEGENDARY_COUNT * LEGENDARY_SUPPLY;
         mythics_lastNumber = legendary_lastNumber + MYTHICS_COUNT * MYTHICS_SUPPLY;
         
-        total_supply = COMMON_1_COUNT + RARE_1_COUNT + RARE_2_COUNT + LEGENDARY_COUNT + MYTHICS_COUNT + 1;  // including thanks card
+        // total_supply = COMMON_1_COUNT + RARE_1_COUNT + RARE_2_COUNT + LEGENDARY_COUNT + MYTHICS_COUNT + 1;  // including thanks card
         characterRandomlyAssigned = new RandomlyAssigned(mythics_lastNumber, address(this));
     }
 
@@ -103,7 +103,8 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
     }
 
     function uri(uint256 tokenId) public view virtual override returns (string memory) {
-        return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
+        return string(abi.encodePacked(baseURI, tokenId.toString()));
+        // return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
     }
 
     function setBaseURI(string memory _newURI) public onlyOwner {
