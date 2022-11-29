@@ -38,7 +38,6 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
     uint256 rare2_lastNumber;
     uint256 legendary_lastNumber;
     uint256 mythics_lastNumber;
-    uint256 total_supply;
 
     mapping(address => mapping(uint256 => uint256)) mintedAmounts;
     mapping(uint256 => address[]) twoMintedAddresses;
@@ -59,7 +58,6 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
         legendary_lastNumber = rare2_lastNumber + LEGENDARY_COUNT * LEGENDARY_SUPPLY;
         mythics_lastNumber = legendary_lastNumber + MYTHICS_COUNT * MYTHICS_SUPPLY;
         
-        // total_supply = COMMON_1_COUNT + RARE_1_COUNT + RARE_2_COUNT + LEGENDARY_COUNT + MYTHICS_COUNT + 1;  // including thanks card
         characterRandomlyAssigned = new RandomlyAssigned(mythics_lastNumber, address(this));
     }
 
@@ -93,9 +91,6 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
              }
             _mint(msg.sender, characterTokenId, 1, "");
         }
-
-        // thanks card
-        // _mint(msg.sender, total_supply , 1, "");
     }
 
     function getTwoMintedAddresses(uint256 _tokenId) public view returns(address[] memory) {
@@ -104,7 +99,6 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
 
     function uri(uint256 tokenId) public view virtual override returns (string memory) {
         return string(abi.encodePacked(baseURI, tokenId.toString()));
-        // return string(abi.encodePacked(baseURI, tokenId.toString(), ".json"));
     }
 
     function setBaseURI(string memory _newURI) public onlyOwner {

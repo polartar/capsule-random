@@ -4,30 +4,17 @@ const {MerkleTree} = require("merkletreejs");
 const whitelist = require("../whitelist.json");
 
 async function main() {
-  // const uris = ["ipfs://QmTdPPuyz8QecxZyvhTyekJeiQn1HmXG5pTstp6YWyBqhr/1.json", "ipfs://QmTdPPuyz8QecxZyvhTyekJeiQn1HmXG5pTstp6YWyBqhr/2.json", "ipfs://QmTdPPuyz8QecxZyvhTyekJeiQn1HmXG5pTstp6YWyBqhr/3.json", "ipfs://QmTdPPuyz8QecxZyvhTyekJeiQn1HmXG5pTstp6YWyBqhr/4.json"]
-
-  // const Pack = await hre.ethers.getContractFactory("Pack");
-  // const pack = await Pack.attach("0x7DF3475715F236a5CE750687612981ff96917D2e");
-  // const pack = await hre.upgrades.deployProxy(Pack, []);
-
-  // await pack.deployed();
-
-  // console.log(`Pack deployed to ${pack.address}`);
-
   const Card = await hre.ethers.getContractFactory("Card");
+  // testnet
+  // const card = await hre.upgrades.deployProxy(Card, ['0x0F7B97b09eefe4170aeC0Ed81f85Ea2919DEBAf3']);
+
+  //mainnet
   const card = await hre.upgrades.deployProxy(Card, ['0x0F7B97b09eefe4170aeC0Ed81f85Ea2919DEBAf3']);
   await card.deployed();
 
   console.log(`Card deployed to ${card.address}`);
-
-  // const leaves = whitelist.map(address => keccak256(address))
-  // tree = new MerkleTree(leaves, keccak256, { sort: true })
-  // const merkleRoot = tree.getHexRoot()
-  // await pack.setMerkleRoot(merkleRoot);
-
-  // const pack = await Pack.attach("0x4d040137230F0bCE6470a58732e0165175Ae2Be6")
-  // await pack.set
-  // await card.setURIs(uris);
+  console.log("setting base uri")
+  await card.setBaseURI("https://tunes.mypinata.cloud/ipfs/QmYRPCxtRxs9baWehSm8NpjcZ49of5uMUQTeKvTaF6f3p6/");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
