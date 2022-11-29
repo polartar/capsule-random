@@ -9,7 +9,7 @@ async function main() {
   // const card = await hre.upgrades.deployProxy(Card, ['0x0F7B97b09eefe4170aeC0Ed81f85Ea2919DEBAf3']);
 
   //mainnet
-  const card = await hre.upgrades.deployProxy(Card, ['0x0F7B97b09eefe4170aeC0Ed81f85Ea2919DEBAf3']);
+  const card = await hre.upgrades.deployProxy(Card, ['0x8045Cb5F58b9a53464121ED22067F28715E55b18']);
   await card.deployed();
 
   console.log(`Card deployed to ${card.address}`);
