@@ -8,7 +8,9 @@ import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
-
+import {
+    DefaultOperatorFilterer1155Upgradeable
+} from "./DefaultOperator/DefaultOperatorFilterer1155Upgradeable.sol"; 
 import './RandomlyAssigned.sol';
 
 interface IPack {
@@ -16,7 +18,7 @@ interface IPack {
     function burn(uint256 _tokenId) external;
     function ownerOf(uint256 tokenId) external view returns (address);
 }
-contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ERC2981Upgradeable {
+contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ERC2981Upgradeable, DefaultOperatorFilterer1155Upgradeable {
     using StringsUpgradeable for uint256;
 
     uint256 constant COMMON_1_SUPPLY = 125;
@@ -50,6 +52,7 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
         __ERC1155_init("");
         __Ownable_init();
         __Pausable_init();
+        __DefaultOperatorFilterer1155_init();
         packContract = _packContract;
        
         common1_lastNumber = COMMON_1_COUNT * COMMON_1_SUPPLY;
@@ -111,5 +114,9 @@ contract Card is ERC1155Upgradeable, OwnableUpgradeable, PausableUpgradeable, ER
 
      function supportsInterface(bytes4 interfaceId) public view override(ERC1155Upgradeable, ERC2981Upgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+     function operatorInitialize() public reinitializer(2) onlyOwner {
+        __DefaultOperatorFilterer1155_init();
     }
 }
