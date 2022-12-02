@@ -8,6 +8,14 @@ async function main() {
  const card = await hre.upgrades.upgradeProxy(addresses.proxy, Card);
   console.log("upgraded: ", card.address)
 
+   await hre.run("verify:verify", {
+    address: await hre.upgrades.erc1967.getImplementationAddress(
+      card.address
+    ),
+    contract: "contracts/Card.sol:Card",
+    constructorArguments: [
+    ],
+  });
 }
 
 // We recommend this pattern to be able to use async/await everywhere
