@@ -10,7 +10,7 @@ async function main() {
 
    await hre.run("verify:verify", {
     address: await hre.upgrades.erc1967.getImplementationAddress(
-      card.address
+      addresses.proxy
     ),
     contract: "contracts/Card.sol:Card",
     constructorArguments: [
